@@ -4,14 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-interface Props {
-  params: {
-    id: string;
-  };
-  searchParams?: {
-    [key: string]: string | string[] | undefined;
-  };
-}
+type Params = Promise<{ id: string }>;
 
 // Obtener los IDs de todos los coches para generación estática
 
@@ -32,8 +25,9 @@ async function getCar(id: string) {
 }
 
 
-export default async function CarDetails({ params }: Props) {
-  const car = await getCar(params.id);
+export default async function CarDetails({ params }: { params: Params }) {
+  const { id } = await params;
+  const car = await getCar(id);
   
 
   console.log(car)
