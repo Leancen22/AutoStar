@@ -200,6 +200,7 @@ const CatalogPage: React.FC = () => {
       <section className="py-16 bg-gray-100">
         <div className="container mx-auto px-4">
           {/* Barra de búsqueda */}
+          <h2 className="text-2xl font-bold mb-6 text-center">Explora las opciones que tenemos para ti</h2>
           <div className="mb-8 flex justify-center w-full">
           <div className="relative w-full max-w-md md:max-w-full">
             <input
@@ -347,7 +348,7 @@ const CatalogPage: React.FC = () => {
                       <h3 className="text-lg font-bold mb-2">{car.title}</h3>
                       <p className="text-gray-700 mb-2">{car.description}</p>
                       <p className="text-lg font-bold text-indigo-600 mb-2">
-                        ${car.price.toLocaleString()}
+                       USD {car.price.toLocaleString()}
                       </p>
                       <span className="text-sm text-gray-500 mb-2">
                         {car.model} {car.year} | {car.km} Km

@@ -698,13 +698,17 @@ export default function Dashboard() {
               <h3 className="font-bold text-lg mb-2">{car.title}</h3>
               <p className="text-sm text-gray-600 mb-2">{car.description}</p>
               <div className="flex justify-between items-center">
-                <span className="font-bold text-lg">${car.price.toLocaleString()}</span>
+                <span className="font-bold text-lg">USD {car.price.toLocaleString()}</span>
                 <div className="space-x-2">
                   <button
                     onClick={() => {
                       setFormData({
                         ...car,
                         image: null,
+                        price: car.price.toString(),
+                        year: car.year.toString(),
+                        km: car.km.toString(),
+                        gallery: []
                       });
                       window.scrollTo(0, 0);
                     }}

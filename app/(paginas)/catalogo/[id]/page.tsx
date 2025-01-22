@@ -95,7 +95,7 @@ export default async function CarDetails({ params }: { params: Params }) {
                 </div>
               </div>
               <p className="text-2xl font-semibold text-indigo-600">
-                ${car.price.toLocaleString()}
+                USD {car.price.toLocaleString()}
               </p>
             </div>
             <div className="mt-6 flex gap-4 flex-col md:flex-row">

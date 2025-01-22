@@ -176,7 +176,7 @@ const CarouselGrid: React.FC = () => {
                   <h3 className="mb-1 text-lg font-semibold">{item.title}</h3>
                   <p className="text-gray-700 mb-2">{item.description}</p>
                   <p className="text-lg font-bold text-indigo-600 mb-2">
-                    ${item.price.toLocaleString()}
+                    USD {item.price.toLocaleString()}
                   </p>
                   <span className="text-sm text-gray-500 mb-2">
                     {item.model} {item.year} | {item.km} Km
