@@ -5,7 +5,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 interface Props {
-  params: { id: string };
+  params: {
+    id: string;
+  };
+  searchParams?: {
+    [key: string]: string | string[] | undefined;
+  };
 }
 
 // Obtener los IDs de todos los coches para generación estática
