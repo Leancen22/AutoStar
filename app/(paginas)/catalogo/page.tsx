@@ -155,12 +155,14 @@ const CatalogPage: React.FC = () => {
   const handleFilterChange = (type: keyof FilterState, value: string | number) => {
     setFilters(prev => ({
       ...prev,
-      [type]: prev[type].includes(value)
-        ? prev[type].filter(item => item !== value)
-        : [...prev[type], value]
+      [type]: Array.isArray(prev[type])
+        ? ((prev[type] as Array<string | number>).includes(value)
+          ? (prev[type] as Array<string | number>).filter(item => item !== value)  
+          : [...(prev[type] as Array<string | number>), value])
+        : prev[type]
     }));
     setCurrentPage(1);
-  };
+   };
 
   if (loading) {
     return (
