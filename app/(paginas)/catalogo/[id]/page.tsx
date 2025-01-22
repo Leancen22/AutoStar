@@ -98,7 +98,7 @@ export default async function CarDetails({ params }: { params: Params }) {
                 ${car.price.toLocaleString()}
               </p>
             </div>
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex gap-4 flex-col md:flex-row">
               <button className="flex-1 rounded bg-indigo-600 px-8 py-4 text-lg font-medium text-white hover:bg-indigo-700 transition">
                 Contáctanos
               </button>

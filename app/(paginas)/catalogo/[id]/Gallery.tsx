@@ -16,7 +16,7 @@ export default function Gallery({ gallery, youtubeURL, financingOptions }: { gal
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollTimeoutRef = useRef<NodeJS.Timeout| undefined>(undefined);
 
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState(false);
