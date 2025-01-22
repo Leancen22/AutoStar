@@ -6,13 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 interface GalleryProps {
   gallery?: string[];
   youtubeUrl?: string[];
-  financingOptions?: Array<{
-    plan: string;
-    details: string;
-  }>;
+  financingOptions?: any
 }
 
-export default function Gallery({ gallery, youtubeURL, financingOptions }: { gallery: string[], youtubeURL?: string[], financingOptions?: Array<{ plan: string; details: string; }> }) {
+export default function Gallery({ gallery, youtubeURL, financingOptions }: { gallery: string[], youtubeURL?: string[], financingOptions?: any }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -155,11 +152,11 @@ export default function Gallery({ gallery, youtubeURL, financingOptions }: { gal
           </div>
         ))}
 
-        {financingOptions && financingOptions.length > 0 && (
+        {financingOptions && Array.isArray(financingOptions) && financingOptions.length > 0 && (
           <div className="mt-12">
             <h2 className="text-2xl font-bold mb-6">Opciones de Financiamiento</h2>
             <div className="flex flex-col gap-4">
-              {financingOptions.map((option, index) => (
+              {(financingOptions as Array<{plan: string; details: string}>).map((option, index) => (
                 <Card key={index}>
                   <CardHeader>
                     <CardTitle>{option.plan}</CardTitle>

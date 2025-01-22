@@ -1,7 +1,26 @@
 "use client"
 
 import React, { useState } from "react";
-import { CarItem } from "@/app/data/cars";
+
+interface CarItem {
+  id: number;
+  title: string;
+  image: string;
+  description: string;
+  tag: string;
+  price: number;
+  category: string;
+  model: string;
+  year: number;
+  km: number;
+  features: string[];
+  specifications: any; // Permite cualquier valor JSON
+  gallery: string[];
+  youtubeUrl?: string[];
+  financingOptions?: any;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export default function Tabs({ car }: { car: CarItem }) {
   const [activeTab, setActiveTab] = useState<"description" | "features" | "specifications">("description");
@@ -34,9 +53,9 @@ export default function Tabs({ car }: { car: CarItem }) {
             ))}
           </ul>
         )}
-        {activeTab === "specifications" && (
+        {activeTab === "specifications" && car.specifications && (
           <ul className="list-inside">
-            {Object.entries(car.specifications ?? {}).map(([key, value]) => (
+            {Object.entries(car.specifications as Record<string, string>).map(([key, value]) => (
               <li key={key}>
                 <strong>{key}:</strong> {value}
               </li>
