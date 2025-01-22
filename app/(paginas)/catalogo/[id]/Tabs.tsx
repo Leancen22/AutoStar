@@ -36,7 +36,7 @@ export default function Tabs({ car }: { car: CarItem }) {
         )}
         {activeTab === "specifications" && (
           <ul className="list-inside">
-            {Object.entries(car.specifications).map(([key, value]) => (
+            {Object.entries(car.specifications ?? {}).map(([key, value]) => (
               <li key={key}>
                 <strong>{key}:</strong> {value}
               </li>
