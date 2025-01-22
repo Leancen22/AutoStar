@@ -3,10 +3,68 @@
 import { useState, useEffect } from "react";
 import { X, Plus, Save, Trash2 } from "lucide-react";
 
+interface Specifications {
+  motor: string;
+  transmision: string;
+  combustible: string;
+  traccion: string;
+  color: string;
+}
+
+interface FinancingOption {
+  name: string;
+  initialPayment: string;
+  monthlyPayment: string;
+  term: string;
+}
+
+interface Car {
+  id: number;
+  title: string;
+  image: string;
+  description: string;
+  tag: string;
+  price: number;
+  category: string;
+  model: string;
+  year: number;
+  km: number;
+  features: string[];
+  specifications: Specifications;
+  gallery: string[];
+  financingOptions: FinancingOption[];
+}
+
+interface FormData {
+  id: number | null;
+  title: string;
+  image: File | null;
+  description: string;
+  tag: string;
+  price: string;
+  category: string;
+  model: string;
+  year: string;
+  km: string;
+  features: string[];
+  specifications: Specifications;
+  gallery: never[];
+  financingOptions: FinancingOption[];
+}
+
+interface Errors {
+  title?: string;
+  description?: string;
+  price?: string;
+  year?: string;
+  km?: string;
+}
+
+
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
-  const [cars, setCars] = useState([]);
-  const [formData, setFormData] = useState({
+  const [cars, setCars] = useState<Car[]>([]);
+  const [formData, setFormData] = useState<FormData>({
     id: null,
     title: "",
     image: null,
@@ -36,8 +94,8 @@ export default function Dashboard() {
     ],
   });
 
-  const [galleryFiles, setGalleryFiles] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -63,7 +121,7 @@ export default function Dashboard() {
   }
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Errors = {};
     if (!formData.title.trim()) newErrors.title = "El título es obligatorio";
     if (!formData.description.trim()) newErrors.description = "La descripción es obligatoria";
     if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = "El precio debe ser mayor a 0";
@@ -83,7 +141,7 @@ export default function Dashboard() {
     });
   };
 
-  const handleRemoveFeature = (index) => {
+  const handleRemoveFeature = (index: number) => {
     const newFeatures = formData.features.filter((_, i) => i !== index);
     setFormData({
       ...formData,
@@ -91,7 +149,7 @@ export default function Dashboard() {
     });
   };
 
-  const handleFeatureChange = (index, value) => {
+  const handleFeatureChange = (index: number, value: string) => {
     const newFeatures = [...formData.features];
     newFeatures[index] = value;
     setFormData({
@@ -115,7 +173,7 @@ export default function Dashboard() {
     });
   };
 
-  const handleRemoveFinancingOption = (index) => {
+  const handleRemoveFinancingOption = (index: number) => {
     const newOptions = formData.financingOptions.filter((_, i) => i !== index);
     setFormData({
       ...formData,
@@ -123,7 +181,7 @@ export default function Dashboard() {
     });
   };
 
-  const handleFinancingOptionChange = (index, key, value) => {
+  const handleFinancingOptionChange = (index: number, key: keyof FinancingOption, value: string) => {
     const newOptions = [...formData.financingOptions];
     newOptions[index] = {
       ...newOptions[index],
@@ -135,18 +193,18 @@ export default function Dashboard() {
     });
   };
 
-  const handleGalleryChange = (e) => {
+  const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
       setGalleryFiles((prev) => [...prev, ...filesArray]);
     }
   };
 
-  const handleGalleryRemove = (index) => {
+  const handleGalleryRemove = (index: number) => {
     setGalleryFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSave = async (e) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -154,129 +212,126 @@ export default function Dashboard() {
     try {
         const formDataToSend = new FormData();
         
+        // Type-safe way to append data
+        const safeAppend = (key: string, value: unknown) => {
+          // Handle null and undefined
+          if (value === null || value === undefined) return;
+
+          // Convert numbers and booleans to strings
+          if (typeof value === 'number' || typeof value === 'boolean') {
+            formDataToSend.append(key, value.toString());
+            return;
+          }
+
+          // Handle strings
+          if (typeof value === 'string') {
+            formDataToSend.append(key, value);
+            return;
+          }
+
+          // Handle Files
+          if (value instanceof File) {
+            formDataToSend.append(key, value);
+            return;
+          }
+
+          // Handle arrays and objects by converting to JSON
+          if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+            formDataToSend.append(key, JSON.stringify(value));
+            return;
+          }
+        };
+
+        // Append ID if exists
         if (formData.id) {
-          formDataToSend.append('id', formData.id);
+          safeAppend('id', formData.id);
         }
-        // Log de los datos que vamos a enviar
-        console.log('Datos del formulario antes de enviar:', {
-          ...formData,
-          image: formData.image ? 'File present' : 'No file',
-          gallery: galleryFiles.length + ' files'
-        });
-        
-        // Asegurarse de que los números son strings antes de enviarlos
+
+        // Prepare data for sending
         const dataToSend = {
           ...formData,
           price: formData.price?.toString() || '',
           year: formData.year?.toString() || '',
           km: formData.km?.toString() || '',
         };
-      
-        // Agregar cada campo al FormData
-        Object.keys(dataToSend).forEach((key) => {
-          if (key === "features" || key === "specifications" || key === "financingOptions") {
-            const jsonValue = JSON.stringify(dataToSend[key]);
-            console.log(`Añadiendo ${key}:`, jsonValue);
-            formDataToSend.append(key, jsonValue);
-          } else if (key === "image" && formData.image) {
-            console.log('Añadiendo imagen');
-            formDataToSend.append(key, formData.image);
-          } else if (key !== "gallery" && dataToSend[key] !== null) {
-            console.log(`Añadiendo ${key}:`, dataToSend[key]);
-            formDataToSend.append(key, dataToSend[key]);
+
+        // Append form fields
+        (Object.keys(dataToSend) as Array<keyof typeof dataToSend>).forEach(key => {
+          if (key !== 'gallery') {
+            safeAppend(key as string, dataToSend[key]);
           }
         });
       
-        // Agregar archivos de la galería
-        galleryFiles.forEach((file, index) => {
-          console.log(`Añadiendo archivo de galería ${index + 1}`);
+        // Append gallery files
+        galleryFiles.forEach(file => {
           formDataToSend.append("gallery", file);
         });
       
         const endpoint = formData.id ? `/api/cars/update` : "/api/cars/create";
         const method = formData.id ? "PUT" : "POST";
       
-        console.log('Enviando petición a:', endpoint, 'método:', method);
+        const response = await fetch(endpoint, {
+          method,
+          body: formDataToSend,
+        });
       
-        try {
-          // Primera petición - guardar el coche
-          const response = await fetch(endpoint, {
-            method,
-            body: formDataToSend,
-          });
-      
-          // Log de la respuesta completa
-          console.log('Respuesta del servidor:', {
-            status: response.status,
-            statusText: response.statusText,
-            headers: Object.fromEntries([...response.headers]),
-          });
-      
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.log('Texto del error:', errorText);
-            
-            let errorMessage;
-            try {
-              // Intentar parsear como JSON
-              const errorJson = JSON.parse(errorText);
-              errorMessage = errorJson.error || errorJson.message || errorText;
-            } catch {
-              // Si no es JSON, usar el texto directamente
-              errorMessage = errorText;
-            }
-            
-            throw new Error(`Error del servidor (${response.status}): ${errorMessage}`);
-          }
-      
-          const data = await response.json();
-          console.log('Datos guardados exitosamente:', data);
-      
-          // Actualizar lista de coches
-          const carsResponse = await fetch("/api/cars");
-          const updatedCars = await carsResponse.json();
-          setCars(updatedCars);
-      
-          // Resetear formulario
-          setFormData({
-            id: null,
-            title: "",
-            image: null,
-            description: "",
-            tag: "",
-            price: "",
-            category: "",
-            model: "",
-            year: "",
-            km: "",
-            features: [""],
-            specifications: {
-              motor: "",
-              transmision: "",
-              combustible: "",
-              traccion: "",
-              color: "",
-            },
-            gallery: [],
-            financingOptions: [
-              {
-                name: "",
-                initialPayment: "",
-                monthlyPayment: "",
-                term: "",
-              },
-            ],
-          });
-          setGalleryFiles([]);
+        if (!response.ok) {
+          const errorText = await response.text();
           
-          alert('Vehículo guardado exitosamente');
-        } catch (fetchError) {
-          console.error('Error en la petición fetch:', fetchError);
-          throw fetchError; // Re-lanzar para el manejo en el catch exterior
+          let errorMessage;
+          try {
+            const errorJson = JSON.parse(errorText);
+            errorMessage = errorJson.error || errorJson.message || errorText;
+          } catch {
+            errorMessage = errorText;
+          }
+          
+          throw new Error(`Error del servidor (${response.status}): ${errorMessage}`);
         }
+      
+        const data = await response.json();
+      
+        // Update cars list
+        const carsResponse = await fetch("/api/cars");
+        const updatedCars = await carsResponse.json();
+        setCars(updatedCars);
+      
+        // Reset form
+        setFormData({
+          id: null,
+          title: "",
+          image: null,
+          description: "",
+          tag: "",
+          price: "",
+          category: "",
+          model: "",
+          year: "",
+          km: "",
+          features: [""],
+          specifications: {
+            motor: "",
+            transmision: "",
+            combustible: "",
+            traccion: "",
+            color: "",
+          },
+          gallery: [],
+          financingOptions: [
+            {
+              name: "",
+              initialPayment: "",
+              monthlyPayment: "",
+              term: "",
+            },
+          ],
+        });
+        setGalleryFiles([]);
+        
+        alert('Vehículo guardado exitosamente');
       } catch (error) {
         console.error('Error en handleSave:', error);
-        alert(error.message || 'Error al guardar el vehículo');
+        alert(error instanceof Error ? error.message : 'Error al guardar el vehículo');
       } finally {
         setIsSubmitting(false);
       }

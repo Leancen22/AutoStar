@@ -68,6 +68,7 @@ const CarouselGrid: React.FC = () => {
     let deltaX = 0;
 
     function updateTrack() {
+      if(!track) return;
       const offset = currentIndex * stepPercent;
       track.style.transform = `translateX(-${offset}%)`;
       updateDots();
@@ -109,7 +110,8 @@ const CarouselGrid: React.FC = () => {
 
     dots.forEach((dot) => {
       dot.addEventListener("click", () => {
-        currentIndex = parseInt(dot.dataset.dot || "0", 10);
+        const dotIndex = (dot as HTMLElement).getAttribute('data-dot');
+        currentIndex = parseInt(dotIndex || "0", 10);
         updateTrack();
       });
     });
