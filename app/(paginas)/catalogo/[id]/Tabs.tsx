@@ -29,7 +29,7 @@ export default function Tabs({ car }: { car: CarItem }) {
         {activeTab === "description" && <p className="text-gray-700">{car.description}</p>}
         {activeTab === "features" && (
           <ul className="list-disc list-inside">
-            {car.features.map((feature) => (
+            {car.features?.map((feature) => (
               <li key={feature}>{feature}</li>
             ))}
           </ul>
