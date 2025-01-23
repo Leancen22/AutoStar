@@ -3,8 +3,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const hardcodedCredentials = {
-  username: 'ad_automoviles',
-  password: 'ad_automoviles1234',
+  username: 'rambla_automoviles',
+  password: 'rambla_automoviles1234',
 };
 
 export default function Login() {
