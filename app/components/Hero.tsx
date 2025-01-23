@@ -99,7 +99,7 @@ const HeroSlider: React.FC = () => {
             />
             
             <div className='absolute inset-0 bg-black/50 p-4'>
-              <div className="text-white relative z-10 flex h-full min-h-screen flex-col items-center justify-center text-center px-8 bg-white/70 md:bg-transparent md:items-start md:text-left md:max-w-[66%] md:p-12 md:pl-[190px]">
+              <div className="text-white relative z-10 flex h-full min-h-screen flex-col items-center justify-center text-center px-8 md:bg-transparent md:items-start md:text-left md:max-w-[66%] md:p-12 md:pl-[190px]">
                 <h1 className="text-3xl md:text-5xl font-bold mb-4">
                   {slide.title}
                 </h1>
