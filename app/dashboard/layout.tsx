@@ -2,6 +2,7 @@ import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import FloatingWhatsappButton from "@/app/components/FloatingButtom";
+import AuthGuard from "../components/AuthGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,7 @@ export default function CatalogoLayout({
     <div className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}`}>
       <Header />
       <div className="bg-gray-100">
-        {children}
+      <AuthGuard> {children} </AuthGuard>
       </div>
       <Footer />
       <FloatingWhatsappButton />
