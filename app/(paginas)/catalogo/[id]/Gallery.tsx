@@ -1,22 +1,41 @@
 "use client"
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious,
+  type CarouselApi 
+} from "@/components/ui/carousel";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface GalleryProps {
-  gallery?: string[];
-  youtubeUrl?: string[];
-  financingOptions?: any
-}
-
-export default function Gallery({ gallery, youtubeURL, financingOptions }: { gallery: string[], youtubeURL?: string[], financingOptions?: any }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout| undefined>(undefined);
-
+export default function Gallery({ 
+  gallery, 
+  youtubeURL, 
+  financingOptions 
+}: { 
+  gallery: string[], 
+  youtubeURL?: string[], 
+  financingOptions?: any 
+}) {
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState(false);
+  const [api, setApi] = useState<CarouselApi>()
+  const [current, setCurrent] = useState(0)
+  const [count, setCount] = useState(0)
+
+  React.useEffect(() => {
+    if (!api) return
+
+    setCount(api.scrollSnapList().length)
+    setCurrent(api.selectedScrollSnap() + 1)
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1)
+    })
+  }, [api])
 
   const getYouTubeThumbnail = (url: string): string => {
     const videoId = url.split('v=')[1];
@@ -33,99 +52,60 @@ export default function Gallery({ gallery, youtubeURL, financingOptions }: { gal
     setIsVideo(video);
   };
 
-  const updateGallery = (index: number) => {
-    const normalizedIndex = (index + gallery.length) % gallery.length;
-    setCurrentIndex(normalizedIndex);
-    
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        left: (normalizedIndex * scrollContainerRef.current.offsetWidth),
-        behavior: 'smooth'
-      });
-    }
-  };
-
   const handleClose = () => {
     setSelectedMedia(null);
     setIsVideo(false);
   };
 
-  const handleScroll = () => {
-    if (!isScrolling) {
-      setIsScrolling(true);
-    }
-
-    // Clear existing timeout
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-
-    // Set new timeout
-    scrollTimeoutRef.current = setTimeout(() => {
-      setIsScrolling(false);
-      if (scrollContainerRef.current) {
-        const scrollPosition = scrollContainerRef.current.scrollLeft;
-        const imageWidth = scrollContainerRef.current.offsetWidth;
-        const newIndex = Math.round(scrollPosition / imageWidth);
-        setCurrentIndex(newIndex);
-      }
-    }, 150); // Ajustado el tiempo para que sea más suave
-  };
-
-  useEffect(() => {
-    return () => {
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
     <div className="flex flex-col md:flex-row gap-6 mb-12">
       <div className="relative w-full md:w-2/3">
-        <div
-          ref={scrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory touch-pan-x scrollbar-hide md:overflow-hidden rounded-lg"
-          onScroll={handleScroll}
+      <Carousel 
+          setApi={setApi}
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full group"
         >
-          {gallery.map((image, index) => (
-            <div
-              key={index}
-              className="flex-none w-full snap-center"
-            >
-              <img
-                src={image}
-                alt={`Imagen ${index + 1}`}
-                className="w-full rounded-lg object-cover"
+          <CarouselContent>
+            {gallery.map((image, index) => (
+              <CarouselItem key={index} className="basis-full">
+                <img
+                  src={image}
+                  alt={`Imagen ${index + 1}`}
+                  className="w-full rounded-lg object-cover"
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          <CarouselPrevious 
+            className="absolute left-4 top-1/2 -translate-y-1/2 
+                       bg-white shadow-md rounded-full w-10 h-10 
+                       flex items-center justify-center"
+          />
+          <CarouselNext 
+            className="absolute right-4 top-1/2 -translate-y-1/2 
+                       bg-white shadow-md rounded-full w-10 h-10 
+                       flex items-center justify-center"
+          />
+
+          {/* Dots personalizados */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            {Array.from({ length: count }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => api?.scrollTo(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  current === index + 1
+                    ? 'bg-indigo-600 w-6' 
+                    : 'bg-gray-300'
+                }`}
               />
-            </div>
-          ))}
-        </div>
-
-        <button
-          className="prev hidden md:block absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow"
-          onClick={() => updateGallery(currentIndex - 1)}
-        >
-          ‹
-        </button>
-        <button
-          className="next hidden md:block absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow"
-          onClick={() => updateGallery(currentIndex + 1)}
-        >
-          ›
-        </button>
-
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {gallery.map((_image, index) => (
-            <button
-              key={index}
-              className={`dot w-3 h-3 rounded-full transition-colors duration-300 ease-in-out ${
-                index === currentIndex ? "bg-indigo-600" : "bg-gray-400"
-              }`}
-              onClick={() => updateGallery(index)}
-            ></button>
-          ))}
-        </div>
+            ))}
+          </div>
+        </Carousel>
       </div>
 
       <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/3">
@@ -134,7 +114,11 @@ export default function Gallery({ gallery, youtubeURL, financingOptions }: { gal
         )}
         
         {youtubeURL?.map((url, index) => (
-          <div key={`video-${index}`} className="rounded-lg overflow-hidden shadow-lg h-64 relative group cursor-pointer" onClick={() => handleMediaClick(url, true)}>
+          <div 
+            key={`video-${index}`} 
+            className="rounded-lg overflow-hidden shadow-lg h-64 relative group cursor-pointer mb-4" 
+            onClick={() => handleMediaClick(url, true)}
+          >
             <img
               src={getYouTubeThumbnail(url)}
               alt={`Video thumbnail ${index + 1}`}
@@ -170,7 +154,6 @@ export default function Gallery({ gallery, youtubeURL, financingOptions }: { gal
           </div>
         )}
       </div>
-
 
       <Dialog open={!!selectedMedia} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-[80vw] h-[80vh] p-0">
