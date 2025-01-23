@@ -58,6 +58,7 @@ interface Errors {
   price?: string;
   year?: string;
   km?: string;
+  image?: string;
 }
 
 
@@ -129,6 +130,10 @@ export default function Dashboard() {
       newErrors.year = "Año inválido";
     }
     if (!formData.km || parseInt(formData.km) < 0) newErrors.km = "Kilometraje inválido";
+
+    if (!formData.id && !formData.image) {
+      newErrors.image = "La imagen principal es obligatoria";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -347,7 +352,7 @@ export default function Dashboard() {
           {/* Información básica */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Título</label>
+              <label className="block text-sm font-medium text-gray-700">Título *</label>
               <input
                 type="text"
                 value={formData.title}
@@ -379,7 +384,7 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Precio</label>
+              <label className="block text-sm font-medium text-gray-700">Precio *</label>
               <input
                 type="number"
                 value={formData.price}
@@ -414,7 +419,7 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Año</label>
+              <label className="block text-sm font-medium text-gray-700">Año *</label>
               <input
                 type="number"
                 value={formData.year}
@@ -429,7 +434,7 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Kilometraje</label>
+              <label className="block text-sm font-medium text-gray-700">Kilometraje *</label>
               <input
                 type="number"
                 value={formData.km}
@@ -446,7 +451,7 @@ export default function Dashboard() {
 
           {/* Descripción */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Descripción</label>
+            <label className="block text-sm font-medium text-gray-700">Descripción *</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -462,7 +467,7 @@ export default function Dashboard() {
 
           {/* Imagen Principal */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Imagen Principal</label>
+            <label className="block text-sm font-medium text-gray-700">Imagen Principal *</label>
             <input
               type="file"
               accept="image/*"
@@ -723,7 +728,8 @@ export default function Dashboard() {
                         setCars(cars.filter((c) => c.id !== car.id));
                       }
                     }}
-                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    className="px-3 py-1 bg-red-400 text-white rounded hover:bg-red-400 "
+                    disabled
                   >
                     Eliminar
                   </button>
